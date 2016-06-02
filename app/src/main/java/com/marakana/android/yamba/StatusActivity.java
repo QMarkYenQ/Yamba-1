@@ -1,7 +1,6 @@
 package com.marakana.android.yamba;
 
 import android.support.v7.app.AppCompatActivity;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -39,70 +38,69 @@ public class StatusActivity extends AppCompatActivity {
         mTextCount = (TextView) findViewById(R.id.status_text_count);
         mTextCount.setText(Integer.toString(140));
         mDefaultColor = mTextCount.getTextColors().getDefaultColor();
-
+        //
+        //  setOnClickListener()
+        //      OnClickListener()
+        //          onClick()
+        //              postTask.execute()
         mButtonTweet.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 String status = mTextStatus.getText().toString();
+                //
                 PostTask postTask = new PostTask();
                 postTask.execute(status);
+                //
                 Log.d(TAG, "onClicked");
             }
-
         });
-
+        //
+        // addTextChangedListener()
+        //      TextWatcher()
+        //           beforeTextChanged()
+        //           afterTextChanged()
+        //           onTextChanged()
         mTextStatus.addTextChangedListener(new TextWatcher() {
-
             @Override
             public void afterTextChanged(Editable s) {
                 int count = 140 - s.length();
                 mTextCount.setText(Integer.toString(count));
-
-                if (count < 50) {
-                    mTextCount.setTextColor(Color.RED);
-                } else {
-                    mTextCount.setTextColor(mDefaultColor);
-                }
+                if (count < 50) mTextCount.setTextColor(Color.RED);
+                else mTextCount.setTextColor(mDefaultColor);
             }
-
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
-
+        //
         Log.d(TAG, "onCreated");
     }
-
+    // onPreExecute()
+    //       ProgressDialog.show()
+    // doInBackground()
+    //      PreferenceManager.getDefaultSharedPreferences()
+    //      cloud.postStatus()
+    // onPostExecute()
+    //      Toast.makeText()
     class PostTask extends AsyncTask<String, Void, String> {
+
         private ProgressDialog progress;
 
         @Override
         protected void onPreExecute() {
-            progress = ProgressDialog.show(StatusActivity.this, "Posting",
-                    "Please wait...");
+            progress = ProgressDialog.show(StatusActivity.this, "Posting", "Please wait...");
             progress.setCancelable(true);
         }
-
         // Executes on a non-UI thread
         @Override
         protected String doInBackground(String... params) {
             try {
-                SharedPreferences prefs = PreferenceManager
-                        .getDefaultSharedPreferences(StatusActivity.this);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StatusActivity.this);
                 String username = prefs.getString("username", "student");
                 String password = prefs.getString("password", "password");
-
                 YambaClient cloud = new YambaClient(username, password);
                 cloud.postStatus(params[0]);
-
                 Log.d(TAG, "Successfully posted to the cloud: " + params[0]);
                 return "Successfully posted";
             } catch (Exception e) {
@@ -111,14 +109,12 @@ public class StatusActivity extends AppCompatActivity {
                 return "Failed to post";
             }
         }
-
         // Called after doInBackground() on UI thread
         @Override
         protected void onPostExecute(String result) {
             progress.dismiss();
             if (this != null && result != null)
-                Toast.makeText(StatusActivity.this, result, Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(StatusActivity.this, result, Toast.LENGTH_LONG).show();
         }
     }
 }
